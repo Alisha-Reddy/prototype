@@ -631,7 +631,11 @@
     isDarkTheme = !isDarkTheme;
     localStorage.setItem('skytrade-proto-theme', isDarkTheme ? 'dark' : 'light');
     applyThemeToDom();
-    if (opMap) { opMap.setStyle(currentMapStyle()); opMap.once('style.load', () => { addOpOverlays(); applyViewModeToLayers(); }); }
+    if (opMap) {
+      mapLayersReady = false;
+      opMap.setStyle(currentMapStyle());
+      opMap.once('style.load', () => { addOpOverlays(); mapLayersReady = true; applyViewModeToLayers(); });
+    }
   }
 
   // FAA-style airspace advisory layers around the Columbus, OH area — clicking any of these
@@ -953,6 +957,7 @@
   // ══════════════ Operational Map — shared map (Municipality Manager + Drone Operator) ══════════════
 
   let opMap = null;
+  let mapLayersReady = false;
   const opDroneMarkers = {};
   let planMarker = null;
 
@@ -1096,6 +1101,7 @@
     opMap.on('load', () => {
       addOpOverlays();
       addOpMarkers();
+      mapLayersReady = true;
       applyViewModeToLayers();
     });
     opMap.on('click', handleMapClick);
@@ -1117,7 +1123,7 @@
     document.getElementById('advisoriesLegend').style.display = viewModes.advisories ? 'flex' : 'none';
     document.getElementById('detectionsLegend').style.display = viewModes.detections ? 'flex' : 'none';
 
-    if (opMap && opMap.isStyleLoaded()) {
+    if (opMap && mapLayersReady) {
       const advisoryVisibility = viewModes.advisories ? 'visible' : 'none';
       airspaceZones.forEach((zone) => {
         opMap.setLayoutProperty(`${zone.id}-fill`, 'visibility', advisoryVisibility);
