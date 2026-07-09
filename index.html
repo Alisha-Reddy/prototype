@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SkyTrade — Drone Activity &amp; Operational Map (role-based)</title>
+<title>SkyTrade — Drone Activity</title>
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.21.0/mapbox-gl.css" rel="stylesheet">
 <style>
   :root {
@@ -22,11 +22,30 @@
     --sky-purple: #7C3AED; --sky-purple-bg: #F5F3FF; --sky-purple-border: #DDD6FE;
     --sky-indigo: #6366F1;
 
-    --sidebar-bg: #0C1929; --sidebar-text: #94A3B8; --sidebar-text-active: #E2E8F0;
-    --sidebar-hover: rgba(255,255,255,0.08); --sidebar-active-bg: rgba(25,118,210,0.18);
-    --sidebar-active-border: #42A5F5; --sidebar-divider: rgba(255,255,255,0.08); --sidebar-section-text: #7B8FA3;
+    --sidebar-bg: #FFFFFF; --sidebar-text: #64748B; --sidebar-text-active: #0F172A;
+    --sidebar-hover: rgba(15,23,42,0.04); --sidebar-active-bg: rgba(25,118,210,0.08);
+    --sidebar-active-border: #1976D2; --sidebar-divider: #E8EDF3; --sidebar-section-text: #94A3B8;
+    --sidebar-border: #E8EDF3; --sidebar-brand-text: #0F172A;
+    --sidebar-card-bg: rgba(15,23,42,0.03); --sidebar-track-bg: rgba(15,23,42,0.12);
 
     --sky-surface: #F8FAFC; --sky-surface-raised: #FFFFFF; --sky-surface-overlay: #F1F5F9; --sky-surface-border: #CBD5E1;
+    --sky-selected-tint: var(--sky-primary-50);
+
+    /* Semantic text tokens — swap per theme; the raw --sky-neutral-* scale itself never changes */
+    --sky-text-primary: var(--sky-neutral-900);
+    --sky-text-secondary: var(--sky-neutral-600);
+    --sky-text-tertiary: var(--sky-neutral-500);
+    --sky-text-muted: var(--sky-neutral-400);
+    --sky-hairline: var(--sky-neutral-100);
+
+    /* Status text on tinted/translucent chip backgrounds — distinct from --sky-success etc.,
+       which stay fixed (dark, saturated) because they're also used as solid marker/badge
+       fills with white text that must not go pale in dark mode. */
+    --sky-status-success-text: var(--sky-success);
+    --sky-status-warning-text: var(--sky-warning);
+    --sky-status-danger-text: var(--sky-danger);
+    --sky-status-info-text: var(--sky-info);
+    --sky-status-purple-text: var(--sky-purple);
 
     --sky-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 
@@ -40,17 +59,50 @@
     --sky-shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.10), 0 8px 10px -6px rgba(0,0,0,0.04);
   }
 
+  :root[data-theme="dark"] {
+    --sky-surface: #0F172A;
+    --sky-surface-raised: #1E293B;
+    --sky-surface-overlay: #243244;
+    --sky-surface-border: #334155;
+
+    --sky-text-primary: #F8FAFC;
+    --sky-text-secondary: #CBD5E1;
+    --sky-text-tertiary: #94A3B8;
+    --sky-text-muted: #64748B;
+    --sky-hairline: rgba(255,255,255,0.08);
+
+    --sky-success-bg: rgba(34,197,94,0.15); --sky-success-border: rgba(34,197,94,0.35);
+    --sky-warning-bg: rgba(245,158,11,0.15); --sky-warning-border: rgba(245,158,11,0.35);
+    --sky-danger-bg: rgba(239,68,68,0.15); --sky-danger-border: rgba(239,68,68,0.35);
+    --sky-info-bg: rgba(14,165,233,0.15); --sky-info-border: rgba(14,165,233,0.35);
+    --sky-purple-bg: rgba(124,58,237,0.18); --sky-purple-border: rgba(124,58,237,0.4);
+
+    --sky-status-success-text: #4ADE80;
+    --sky-status-warning-text: #FBBF24;
+    --sky-status-danger-text: #F87171;
+    --sky-status-info-text: #38BDF8;
+    --sky-status-purple-text: #C4B5FD;
+
+    --sky-selected-tint: rgba(66,165,245,0.16);
+
+    --sidebar-bg: #0C1929; --sidebar-text: #94A3B8; --sidebar-text-active: #E2E8F0;
+    --sidebar-hover: rgba(255,255,255,0.08); --sidebar-active-bg: rgba(25,118,210,0.18);
+    --sidebar-active-border: #42A5F5; --sidebar-divider: rgba(255,255,255,0.06); --sidebar-section-text: #7B8FA3;
+    --sidebar-border: rgba(255,255,255,0.06); --sidebar-brand-text: #F8FAFC;
+    --sidebar-card-bg: rgba(255,255,255,0.04); --sidebar-track-bg: rgba(255,255,255,0.16);
+  }
+
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
-  body { font-family: var(--sky-font-sans); background: var(--sky-surface); color: var(--sky-neutral-900); -webkit-font-smoothing: antialiased; overflow: hidden; }
+  body { font-family: var(--sky-font-sans); background: var(--sky-surface); color: var(--sky-text-primary); -webkit-font-smoothing: antialiased; overflow: hidden; }
 
   .app-shell { display: flex; height: 100vh; width: 100%; }
 
   /* ── Sidebar ─────────────────────────────────────────────── */
-  .sidebar { width: 264px; flex-shrink: 0; background: var(--sidebar-bg); display: flex; flex-direction: column; height: 100%; border-right: 1px solid rgba(255,255,255,0.06); }
+  .sidebar { width: 264px; flex-shrink: 0; background: var(--sidebar-bg); display: flex; flex-direction: column; height: 100%; border-right: 1px solid var(--sidebar-border); }
   .sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 18px 20px 14px; flex-shrink: 0; }
   .sidebar-brand-mark { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, var(--sky-primary-400), var(--sky-primary-700)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 15px; }
-  .sidebar-brand-name { color: #F8FAFC; font-weight: 700; font-size: 15.5px; letter-spacing: -0.01em; }
+  .sidebar-brand-name { color: var(--sidebar-brand-text); font-weight: 700; font-size: 15.5px; letter-spacing: -0.01em; }
   .sidebar-brand-sub { color: var(--sidebar-text); font-size: 11px; padding: 0 20px 10px; }
   .sidebar-scroll { flex: 1; overflow-y: auto; padding: 4px 10px 10px; }
   .sidebar-section { margin-bottom: 4px; border-radius: 10px; }
@@ -65,14 +117,14 @@
   .sidebar-item.active svg { opacity: 1; color: var(--sky-primary-400); }
   .sidebar-item .new-badge { margin-left: auto; font-size: 9px; font-weight: 800; background: var(--sky-purple); color: white; padding: 1.5px 6px; border-radius: 999px; letter-spacing: 0.03em; }
   .sidebar-bottom { padding: 10px; flex-shrink: 0; }
-  .sidebar-user { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,0.04); margin-bottom: 6px; }
+  .sidebar-user { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; background: var(--sidebar-card-bg); margin-bottom: 6px; }
   .sidebar-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--sky-primary-600); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
   .sidebar-user-email { font-size: 11.5px; color: var(--sidebar-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .sidebar-user-role { font-size: 11px; color: var(--sky-primary-400); font-weight: 600; }
 
   .role-switcher { padding: 0 10px 10px; }
   .role-switcher-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--sidebar-section-text); padding: 0 4px 6px; }
-  .role-switcher-btns { display: flex; background: rgba(255,255,255,0.06); border-radius: 9px; padding: 3px; gap: 2px; }
+  .role-switcher-btns { display: flex; background: var(--sidebar-card-bg); border-radius: 9px; padding: 3px; gap: 2px; }
   .role-btn { flex: 1; text-align: center; font-size: 11px; font-weight: 600; padding: 7px 4px; border-radius: 7px; color: var(--sidebar-text); cursor: pointer; transition: background 0.15s ease, color 0.15s ease; }
   .role-btn.active { background: var(--sky-primary-600); color: white; }
 
@@ -88,11 +140,10 @@
   .banner { position: absolute; top: 0; left: 0; right: 0; z-index: 30; background: var(--sky-neutral-900); color: white; text-align: center; font-size: 11.5px; padding: 5px; letter-spacing: 0.03em; font-weight: 600; }
 
   .topbar { position: absolute; top: 26px; left: 0; right: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; pointer-events: none; }
-  .searchbar { pointer-events: auto; display: flex; align-items: center; gap: 10px; background: var(--sky-surface-raised); border: 1px solid var(--sky-surface-border); border-radius: var(--sky-radius-full); padding: 11px 18px; width: 340px; box-shadow: var(--sky-shadow-md); color: var(--sky-neutral-500); font-size: 13.5px; }
+  .searchbar { pointer-events: auto; display: flex; align-items: center; gap: 10px; background: var(--sky-surface-raised); border: 1px solid var(--sky-surface-border); border-radius: var(--sky-radius-full); padding: 11px 18px; width: 340px; box-shadow: var(--sky-shadow-md); color: var(--sky-text-tertiary); font-size: 13.5px; }
   .topbar-right { display: flex; gap: 10px; pointer-events: auto; }
-  .icon-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--sky-surface-raised); border: 1px solid var(--sky-surface-border); box-shadow: var(--sky-shadow-md); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--sky-neutral-600); }
+  .icon-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--sky-surface-raised); border: 1px solid var(--sky-surface-border); box-shadow: var(--sky-shadow-md); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--sky-text-secondary); }
   .icon-btn:hover { background: var(--sky-surface-overlay); }
-  .icon-btn.active { background: var(--sky-primary-50); color: var(--sky-primary-700); border-color: var(--sky-primary-100); }
 
   .pin { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25)); }
   .pin-drop { position: absolute; inset: 0; background: var(--sky-primary-600); border-radius: 50% 50% 50% 0; transform: rotate(45deg); }
@@ -117,55 +168,55 @@
   @keyframes pulse { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(2.4); opacity: 0; } }
   @media (prefers-reduced-motion: reduce) { .drone-marker-pulse { animation: none; } }
 
-  .map-token-notice { position: absolute; inset: 26px 0 0 0; z-index: 5; display: none; align-items: center; justify-content: center; background: var(--sky-neutral-100); text-align: center; padding: 40px; }
+  .map-token-notice { position: absolute; inset: 26px 0 0 0; z-index: 5; display: none; align-items: center; justify-content: center; background: var(--sky-surface-overlay); text-align: center; padding: 40px; }
   .map-token-notice-card { max-width: 460px; background: var(--sky-surface-raised); border: 1px solid var(--sky-surface-border); border-radius: var(--sky-radius-lg); box-shadow: var(--sky-shadow-md); padding: 28px; }
-  .map-token-notice-card h3 { margin: 0 0 8px; font-size: 15px; color: var(--sky-neutral-900); }
-  .map-token-notice-card p { margin: 0 0 6px; font-size: 13px; color: var(--sky-neutral-600); line-height: 1.6; }
-  .map-token-notice-card code { background: var(--sky-neutral-100); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+  .map-token-notice-card h3 { margin: 0 0 8px; font-size: 15px; color: var(--sky-text-primary); }
+  .map-token-notice-card p { margin: 0 0 6px; font-size: 13px; color: var(--sky-text-secondary); line-height: 1.6; }
+  .map-token-notice-card code { background: var(--sky-surface-overlay); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
 
-  .legend { position: absolute; bottom: 20px; left: 20px; z-index: 20; background: rgba(255,255,255,0.96); border: 1px solid var(--sky-surface-border); border-radius: var(--sky-radius-md); padding: 10px 14px; box-shadow: var(--sky-shadow-md); font-size: 11.5px; color: var(--sky-neutral-600); display: flex; flex-direction: column; gap: 6px; }
+  .legend { position: absolute; bottom: 20px; left: 20px; z-index: 20; background: rgba(255,255,255,0.96); border: 1px solid var(--sky-surface-border); border-radius: var(--sky-radius-md); padding: 10px 14px; box-shadow: var(--sky-shadow-md); font-size: 11.5px; color: var(--sky-text-secondary); display: flex; flex-direction: column; gap: 6px; }
   .legend-row { display: flex; align-items: center; gap: 7px; }
   .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 
   .side-panel { position: absolute; top: 78px; right: 20px; width: 340px; max-height: calc(100% - 100px); background: var(--sky-surface-raised); border: 1px solid var(--sky-surface-border); border-radius: var(--sky-radius-lg); box-shadow: var(--sky-shadow-xl); z-index: 22; overflow: hidden; display: none; flex-direction: column; }
   .side-panel.open { display: flex; }
   .side-panel-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 16px 16px 12px; border-bottom: 1px solid var(--sky-surface-border); }
-  .side-panel-title { font-size: 14px; font-weight: 700; color: var(--sky-neutral-900); }
-  .side-panel-sub { font-size: 11.5px; color: var(--sky-neutral-500); margin-top: 2px; }
-  .side-panel-close { width: 26px; height: 26px; border-radius: 50%; border: none; background: transparent; color: var(--sky-neutral-400); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  .side-panel-close:hover { background: var(--sky-neutral-100); color: var(--sky-neutral-700); }
+  .side-panel-title { font-size: 14px; font-weight: 700; color: var(--sky-text-primary); }
+  .side-panel-sub { font-size: 11.5px; color: var(--sky-text-tertiary); margin-top: 2px; }
+  .side-panel-close { width: 26px; height: 26px; border-radius: 50%; border: none; background: transparent; color: var(--sky-text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .side-panel-close:hover { background: var(--sky-surface-overlay); color: var(--sky-text-secondary); }
   .side-panel-body { padding: 14px 16px; overflow-y: auto; flex: 1; }
 
   .advisory-item { border: 1px solid var(--sky-surface-border); border-radius: var(--sky-radius-md); margin-bottom: 10px; overflow: hidden; }
   .advisory-item-head { display: flex; align-items: center; gap: 9px; padding: 11px 12px; background: var(--sky-warning-bg); }
-  .advisory-item-head svg { color: var(--sky-warning); flex-shrink: 0; }
-  .advisory-item-title { font-size: 12px; font-weight: 700; color: var(--sky-warning); text-transform: uppercase; letter-spacing: 0.03em; }
-  .advisory-item-name { font-size: 13.5px; font-weight: 600; color: var(--sky-neutral-900); }
-  .advisory-item-body { padding: 11px 12px; font-size: 12.5px; line-height: 1.5; color: var(--sky-neutral-600); }
+  .advisory-item-head svg { color: var(--sky-status-warning-text); flex-shrink: 0; }
+  .advisory-item-title { font-size: 12px; font-weight: 700; color: var(--sky-status-warning-text); text-transform: uppercase; letter-spacing: 0.03em; }
+  .advisory-item-name { font-size: 13.5px; font-weight: 600; color: var(--sky-text-primary); }
+  .advisory-item-body { padding: 11px 12px; font-size: 12.5px; line-height: 1.5; color: var(--sky-text-secondary); }
   .advisory-item-head.uncontrolled { background: var(--sky-success-bg); }
-  .advisory-item-head.uncontrolled svg { color: var(--sky-success); }
-  .advisory-item-title.uncontrolled { color: var(--sky-success); }
+  .advisory-item-head.uncontrolled svg { color: var(--sky-status-success-text); }
+  .advisory-item-title.uncontrolled { color: var(--sky-status-success-text); }
 
   .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; border-radius: var(--sky-radius-md); font-size: 13.5px; font-weight: 600; padding: 10px 16px; cursor: pointer; border: 1px solid transparent; width: 100%; }
   .btn-primary { background: var(--sky-primary-600); color: white; }
   .btn-primary:hover { background: var(--sky-primary-700); }
-  .btn-outline { background: var(--sky-surface-raised); color: var(--sky-neutral-700); border-color: var(--sky-surface-border); width: auto; }
+  .btn-outline { background: var(--sky-surface-raised); color: var(--sky-text-secondary); border-color: var(--sky-surface-border); width: auto; }
   .btn-outline:hover { background: var(--sky-surface-overlay); }
 
   .status-chip { font-size: 10.5px; font-weight: 700; padding: 2px 9px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.03em; }
-  .status-chip.authorized { background: var(--sky-success-bg); color: var(--sky-success); border: 1px solid var(--sky-success-border); }
-  .status-chip.unknown { background: var(--sky-warning-bg); color: var(--sky-warning); border: 1px solid var(--sky-warning-border); }
-  .status-chip.suspicious { background: var(--sky-danger-bg); color: var(--sky-danger); border: 1px solid var(--sky-danger-border); }
-  .status-chip.law_enforcement_referral { background: var(--sky-purple-bg); color: var(--sky-purple); border: 1px solid var(--sky-purple-border); }
+  .status-chip.authorized { background: var(--sky-success-bg); color: var(--sky-status-success-text); border: 1px solid var(--sky-success-border); }
+  .status-chip.unknown { background: var(--sky-warning-bg); color: var(--sky-status-warning-text); border: 1px solid var(--sky-warning-border); }
+  .status-chip.suspicious { background: var(--sky-danger-bg); color: var(--sky-status-danger-text); border: 1px solid var(--sky-danger-border); }
+  .status-chip.law_enforcement_referral { background: var(--sky-purple-bg); color: var(--sky-status-purple-text); border: 1px solid var(--sky-purple-border); }
 
-  .detail-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid var(--sky-neutral-100); }
-  .detail-row span:first-child { color: var(--sky-neutral-500); }
-  .detail-row span:last-child { color: var(--sky-neutral-900); font-weight: 600; }
+  .detail-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid var(--sky-hairline); }
+  .detail-row span:first-child { color: var(--sky-text-tertiary); }
+  .detail-row span:last-child { color: var(--sky-text-primary); font-weight: 600; }
 
-  .readonly-note { display: flex; align-items: flex-start; gap: 9px; padding: 10px 12px; background: var(--sky-info-bg); border: 1px solid var(--sky-info-border); color: var(--sky-info); border-radius: var(--sky-radius-md); font-size: 12px; line-height: 1.5; margin-top: 12px; }
+  .readonly-note { display: flex; align-items: flex-start; gap: 9px; padding: 10px 12px; background: var(--sky-info-bg); border: 1px solid var(--sky-info-border); color: var(--sky-status-info-text); border-radius: var(--sky-radius-md); font-size: 12px; line-height: 1.5; margin-top: 12px; }
   .readonly-note svg { flex-shrink: 0; margin-top: 1px; }
 
-  .proto-tag { position: fixed; bottom: 12px; right: 16px; z-index: 100; font-size: 10.5px; color: var(--sky-neutral-400); background: rgba(255,255,255,0.85); padding: 3px 9px; border-radius: 999px; border: 1px solid var(--sky-surface-border); }
+  .proto-tag { position: fixed; bottom: 12px; right: 16px; z-index: 100; font-size: 10.5px; color: var(--sky-text-muted); background: rgba(255,255,255,0.85); padding: 3px 9px; border-radius: 999px; border: 1px solid var(--sky-surface-border); }
 
   /* ── Drone Activity view (dedicated page, Municipality Manager) — map-first with overlay panels ─── */
   .header-actions { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
@@ -179,18 +230,18 @@
     border-radius: var(--sky-radius-lg); box-shadow: var(--sky-shadow-lg); padding: 14px 18px;
     transition: top 0.2s ease;
   }
-  .da-topbar-title { font-size: 1.15rem; font-weight: 700; color: var(--sky-neutral-900); margin: 0 0 2px; letter-spacing: -0.01em; }
-  .da-topbar-sub { font-size: 0.8rem; color: var(--sky-neutral-500); margin: 0; }
+  .da-topbar-title { font-size: 1.15rem; font-weight: 700; color: var(--sky-text-primary); margin: 0 0 2px; letter-spacing: -0.01em; }
+  .da-topbar-sub { font-size: 0.8rem; color: var(--sky-text-tertiary); margin: 0; }
 
   .incident-card { border: 1px solid var(--sky-surface-border); border-radius: var(--sky-radius-md); padding: 12px; margin-bottom: 8px; cursor: pointer; transition: border-color .12s ease, box-shadow .12s ease; }
   .incident-card:hover { border-color: var(--sky-primary-300); box-shadow: var(--sky-shadow-md); }
-  .incident-card.selected { border-color: var(--sky-primary-500); background: var(--sky-primary-50); }
+  .incident-card.selected { border-color: var(--sky-primary-500); background: var(--sky-selected-tint); }
   .incident-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-  .incident-id { font-size: 12.5px; font-weight: 700; color: var(--sky-neutral-900); font-variant-numeric: tabular-nums; }
-  .incident-meta { font-size: 11.5px; color: var(--sky-neutral-500); }
+  .incident-id { font-size: 12.5px; font-weight: 700; color: var(--sky-text-primary); font-variant-numeric: tabular-nums; }
+  .incident-meta { font-size: 11.5px; color: var(--sky-text-tertiary); }
 
   #console-map { position: absolute; inset: 0; }
-  .map-legend { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 20; background: rgba(255,255,255,0.96); border: 1px solid var(--sky-surface-border); border-radius: var(--sky-radius-md); padding: 9px 14px; box-shadow: var(--sky-shadow-md); font-size: 11.5px; color: var(--sky-neutral-600); display: flex; align-items: center; gap: 16px; }
+  .map-legend { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 20; background: rgba(255,255,255,0.96); border: 1px solid var(--sky-surface-border); border-radius: var(--sky-radius-md); padding: 9px 14px; box-shadow: var(--sky-shadow-md); font-size: 11.5px; color: var(--sky-text-secondary); display: flex; align-items: center; gap: 16px; }
 
   .side-panel-left { left: 20px; right: auto; }
   #droneListPanel, #droneDetailPanel { top: 92px; max-height: calc(100% - 112px); transition: top 0.2s ease, max-height 0.2s ease; }
@@ -203,7 +254,7 @@
     background: var(--sky-surface-raised); border: 1px solid var(--sky-surface-border);
     border-radius: var(--sky-radius-full); padding: 10px 16px;
     box-shadow: var(--sky-shadow-lg); cursor: pointer;
-    font-size: 13px; font-weight: 600; color: var(--sky-neutral-700);
+    font-size: 13px; font-weight: 600; color: var(--sky-text-secondary);
     transition: top 0.2s ease; font-family: inherit;
   }
   .da-list-toggle:hover { background: var(--sky-surface-overlay); }
@@ -225,28 +276,68 @@
   #viewDroneActivity.has-notification #droneDetailPanel { top: 148px; max-height: calc(100% - 168px); }
   #viewDroneActivity.has-notification .da-list-toggle { top: 148px; }
 
-  .detail-section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--sky-neutral-400); margin: 16px 0 8px; }
+  .detail-section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--sky-text-muted); margin: 16px 0 8px; }
   .detail-section-label:first-child { margin-top: 0; }
   .classify-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .classify-btn { border: 1px solid var(--sky-surface-border); background: var(--sky-surface-raised); border-radius: var(--sky-radius-md); padding: 8px; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; color: var(--sky-neutral-700); }
+  .classify-btn { border: 1px solid var(--sky-surface-border); background: var(--sky-surface-raised); border-radius: var(--sky-radius-md); padding: 8px; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; color: var(--sky-text-secondary); }
   .classify-btn:hover { background: var(--sky-surface-overlay); }
-  .classify-btn.selected.authorized { background: var(--sky-success-bg); border-color: var(--sky-success-border); color: var(--sky-success); }
-  .classify-btn.selected.suspicious { background: var(--sky-danger-bg); border-color: var(--sky-danger-border); color: var(--sky-danger); }
-  .classify-btn.selected.unknown { background: var(--sky-warning-bg); border-color: var(--sky-warning-border); color: var(--sky-warning); }
-  .classify-btn.selected.law_enforcement_referral { background: var(--sky-purple-bg); border-color: var(--sky-purple-border); color: var(--sky-purple); }
+  .classify-btn.selected.authorized { background: var(--sky-success-bg); border-color: var(--sky-success-border); color: var(--sky-status-success-text); }
+  .classify-btn.selected.suspicious { background: var(--sky-danger-bg); border-color: var(--sky-danger-border); color: var(--sky-status-danger-text); }
+  .classify-btn.selected.unknown { background: var(--sky-warning-bg); border-color: var(--sky-warning-border); color: var(--sky-status-warning-text); }
+  .classify-btn.selected.law_enforcement_referral { background: var(--sky-purple-bg); border-color: var(--sky-purple-border); color: var(--sky-status-purple-text); }
   .classify-btn.pending { border-style: dashed; border-width: 2px; }
-  .classify-pending-note { font-size: 11.5px; color: var(--sky-neutral-500); margin-bottom: 8px; }
+  .classify-pending-note { font-size: 11.5px; color: var(--sky-text-tertiary); margin-bottom: 8px; }
   .classify-save-row { display: flex; gap: 8px; margin-top: 10px; }
   .classify-save-row .btn { padding: 8px 14px; font-size: 12.5px; }
   .export-row { display: flex; gap: 6px; flex-wrap: wrap; }
-  .export-chip { font-size: 11.5px; font-weight: 600; padding: 6px 11px; border-radius: var(--sky-radius-md); border: 1px solid var(--sky-surface-border); background: var(--sky-surface-raised); cursor: pointer; color: var(--sky-neutral-700); }
+  .export-chip { font-size: 11.5px; font-weight: 600; padding: 6px 11px; border-radius: var(--sky-radius-md); border: 1px solid var(--sky-surface-border); background: var(--sky-surface-raised); cursor: pointer; color: var(--sky-text-secondary); }
   .export-chip:hover { background: var(--sky-surface-overlay); }
   .timeline-item { display: flex; gap: 10px; padding: 8px 0; font-size: 12.5px; }
   .timeline-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sky-primary-400); margin-top: 5px; flex-shrink: 0; }
-  .timeline-text { color: var(--sky-neutral-700); }
-  .timeline-time { color: var(--sky-neutral-400); font-size: 11px; }
+  .timeline-text { color: var(--sky-text-secondary); }
+  .timeline-time { color: var(--sky-text-muted); font-size: 11px; }
 
   .mapboxgl-ctrl-logo { opacity: 0.5; }
+
+  /* ── Audit Log view (Municipality Manager) ─── */
+  #viewAuditLog { overflow-y: auto; background: var(--sky-surface); }
+  .audit-page { max-width: 1100px; margin: 0 auto; padding: 32px 40px 60px; }
+  .audit-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .audit-title { font-size: 1.5rem; font-weight: 700; color: var(--sky-text-primary); letter-spacing: -0.01em; }
+  .audit-subtitle { font-size: 0.85rem; color: var(--sky-text-tertiary); margin-top: 4px; }
+  .audit-back-link { font-size: 13px; font-weight: 600; color: var(--sky-primary-500); cursor: pointer; text-decoration: none; flex-shrink: 0; white-space: nowrap; }
+  .audit-back-link:hover { text-decoration: underline; }
+  .audit-description { font-size: 13px; color: var(--sky-text-secondary); max-width: 640px; margin: 14px 0 20px; line-height: 1.5; }
+
+  .audit-filter-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .audit-filter-label { font-size: 12.5px; color: var(--sky-text-tertiary); font-weight: 600; }
+  .audit-filter-select { padding: 7px 12px; border-radius: var(--sky-radius-md); border: 1px solid var(--sky-surface-border); background: var(--sky-surface-raised); color: var(--sky-text-primary); font-size: 13px; font-family: inherit; cursor: pointer; }
+
+  .audit-table-wrap { border: 1px solid var(--sky-surface-border); border-radius: var(--sky-radius-lg); overflow: hidden; background: var(--sky-surface-raised); overflow-x: auto; }
+  .audit-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .audit-table th { text-align: left; padding: 10px 16px; background: var(--sky-surface-overlay); color: var(--sky-text-tertiary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; font-size: 11px; border-bottom: 1px solid var(--sky-surface-border); white-space: nowrap; }
+  .audit-table td { padding: 10px 16px; border-bottom: 1px solid var(--sky-hairline); color: var(--sky-text-secondary); vertical-align: top; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .audit-table td.audit-details { white-space: normal; word-break: break-word; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11.5px; color: var(--sky-text-tertiary); max-width: 340px; }
+  .audit-table tr:last-child td { border-bottom: none; }
+  .audit-table tr:hover td { background: var(--sky-surface-overlay); }
+  .audit-empty-row td { text-align: center; color: var(--sky-text-muted); padding: 28px 16px; }
+
+  /* Floating translucent cards over the map use a hardcoded white tint for the frosted-glass
+     look — flip it to a dark tint in dark mode (these intentionally don't use --sky-surface-*
+     since they need transparency to show map tiles through the edges). */
+  :root[data-theme="dark"] #map { background: #0F172A; }
+  :root[data-theme="dark"] .legend,
+  :root[data-theme="dark"] .map-legend { background: rgba(30,41,59,0.94); }
+  :root[data-theme="dark"] .proto-tag { background: rgba(30,41,59,0.85); }
+
+  /* Theme toggle switch (sidebar) */
+  .theme-toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 12px; border-radius: 10px; margin-bottom: 6px; color: var(--sidebar-text); font-size: 12.5px; font-weight: 600; }
+  .theme-toggle-row-label { display: flex; align-items: center; gap: 8px; }
+  .theme-toggle-row svg { width: 15px; height: 15px; flex-shrink: 0; }
+  .theme-switch { position: relative; width: 38px; height: 21px; border-radius: 999px; background: var(--sidebar-track-bg); cursor: pointer; flex-shrink: 0; transition: background 0.15s ease; }
+  .theme-switch-thumb { position: absolute; top: 2px; left: 2px; width: 17px; height: 17px; border-radius: 50%; background: white; transition: left 0.15s ease; }
+  .theme-switch.on { background: var(--sky-primary-600); }
+  .theme-switch.on .theme-switch-thumb { left: 19px; }
 </style>
 </head>
 <body>
@@ -324,6 +415,15 @@
     </div>
 
     <div class="sidebar-bottom">
+      <div class="theme-toggle-row">
+        <span class="theme-toggle-row-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          Dark mode
+        </span>
+        <div class="theme-switch" id="themeSwitch" onclick="toggleTheme()">
+          <div class="theme-switch-thumb"></div>
+        </div>
+      </div>
       <div class="role-switcher">
         <div class="role-switcher-label">Prototype: view as</div>
         <div class="role-switcher-btns">
@@ -354,7 +454,7 @@
         <div class="map-token-notice-card">
           <h3>Add a Mapbox token to load the live map</h3>
           <p>This prototype uses real Mapbox GL JS, not a stylized placeholder.</p>
-          <p>Edit <code>prototypes/config.js</code> and set:</p>
+          <p>Edit <code>index.html</code> and set:</p>
           <p><code>window.MAPBOX_TOKEN = "pk.xxxxx"</code></p>
           <p>Get a public token at <code>account.mapbox.com/access-tokens</code>, then reload this page.</p>
         </div>
@@ -368,9 +468,6 @@
         <div class="topbar-right">
           <div class="icon-btn" title="My location">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
-          </div>
-          <div class="icon-btn" id="themeToggleBtn" title="Toggle dark map style">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.4-11.4 1.4-1.4"/></svg>
           </div>
         </div>
       </div>
@@ -423,7 +520,7 @@
       <div class="map-token-notice" id="mapTokenNoticeConsole">
         <div class="map-token-notice-card">
           <h3>Add a Mapbox token</h3>
-          <p>Edit <code>prototypes/config.js</code>:</p>
+          <p>Edit <code>index.html</code>:</p>
           <p><code>window.MAPBOX_TOKEN = "pk.xxxxx"</code></p>
           <p>Reload after saving.</p>
         </div>
@@ -435,7 +532,11 @@
           <div class="da-topbar-sub">Live monitoring — Licking County UAS Awareness Zone (draft), Heath-Newark-Licking County, OH</div>
         </div>
         <div class="header-actions">
-          <button class="btn btn-primary" style="width:auto;">
+          <button class="btn btn-outline" style="width:auto;" onclick="navigateTo('auditLog')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 4v16"/></svg>
+            Audit Log
+          </button>
+          <button class="btn btn-primary" style="width:auto;" onclick="exportAllDetections()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
             Export All
           </button>
@@ -449,14 +550,14 @@
         <div class="legend-row"><span class="legend-dot" style="background:var(--sky-purple);"></span> LE Referral</div>
       </div>
 
-      <!-- Collapsed-by-default toggle for the detection list -->
-      <button class="da-list-toggle" id="droneListToggle" onclick="toggleDroneList()">
+      <!-- Toggle for the detection list (hidden while the panel is open) -->
+      <button class="da-list-toggle" id="droneListToggle" onclick="toggleDroneList()" style="display:none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
         Detections (9)
       </button>
 
-      <!-- Floating detection list (overlay, closed by default) -->
-      <div class="side-panel side-panel-left" id="droneListPanel">
+      <!-- Floating detection list (overlay, open by default) -->
+      <div class="side-panel side-panel-left open" id="droneListPanel">
         <div class="side-panel-header">
           <div class="side-panel-title">Detections (9)</div>
           <button class="side-panel-close" onclick="closeDroneListPanel()">
@@ -478,6 +579,38 @@
       </div>
     </div>
 
+    <!-- ═══════════ VIEW: Audit Log (Municipality Manager) ═══════════ -->
+    <div class="view" id="viewAuditLog" style="display:none;">
+      <div class="audit-page">
+        <div class="audit-header">
+          <div>
+            <div class="audit-title">Audit log</div>
+            <div class="audit-subtitle">alenaartz2019@gmail.com</div>
+          </div>
+          <a class="audit-back-link" onclick="navigateTo('droneActivity')">Back to Drone Activity</a>
+        </div>
+        <p class="audit-description">Read-only trail of authentication, exports, disposition changes, and alert notifications. For records management and compliance review.</p>
+        <div class="audit-filter-row">
+          <span class="audit-filter-label">Filter by action</span>
+          <select class="audit-filter-select" id="auditFilterSelect" onchange="renderAuditLog()">
+            <option value="all">All actions</option>
+            <option value="Login">Login</option>
+            <option value="Disposition changed">Disposition changed</option>
+            <option value="Alert email sent">Alert email sent</option>
+            <option value="Export">Export</option>
+          </select>
+        </div>
+        <div class="audit-table-wrap">
+          <table class="audit-table">
+            <thead>
+              <tr><th>Time</th><th>Action</th><th>Actor</th><th>Resource</th><th>Details</th></tr>
+            </thead>
+            <tbody id="auditTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -485,7 +618,11 @@
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.21.0/mapbox-gl.js"></script>
 <script src="./geo-shapes.js"></script>
-<script src="./config.js"></script>
+<script>
+  // Injected at deploy time from the MAPBOX_TOKEN repo secret (see .github/workflows/deploy.yml).
+  // For local dev, replace the placeholder below with your own pk.* token (don't commit that change).
+  window.MAPBOX_TOKEN = "__MAPBOX_TOKEN__";
+</script>
 <script>
   // ── Real deployment reference points from the fema-grant repo ──
   // Licking County UAS Awareness Zone (draft): packages/web-shared/src/map/constants.ts
@@ -498,6 +635,27 @@
     light: 'mapbox://styles/mapbox/streets-v12',
     dark: 'mapbox://styles/mapbox/dark-v11',
   };
+
+  // ══════════════ Theme (light/dark) — global, drives page chrome + both maps ══════════════
+  let isDarkTheme = localStorage.getItem('skytrade-proto-theme') === 'dark';
+
+  function currentMapStyle() {
+    return isDarkTheme ? MAP_STYLES.dark : MAP_STYLES.light;
+  }
+
+  function applyThemeToDom() {
+    document.documentElement.setAttribute('data-theme', isDarkTheme ? 'dark' : 'light');
+    const toggle = document.getElementById('themeSwitch');
+    if (toggle) toggle.classList.toggle('on', isDarkTheme);
+  }
+
+  function toggleTheme() {
+    isDarkTheme = !isDarkTheme;
+    localStorage.setItem('skytrade-proto-theme', isDarkTheme ? 'dark' : 'light');
+    applyThemeToDom();
+    if (opMap) { opMap.setStyle(currentMapStyle()); opMap.once('style.load', addOpOverlays); }
+    if (consoleMap) { consoleMap.setStyle(currentMapStyle()); consoleMap.once('style.load', addConsoleZoneLayer); }
+  }
 
   // FAA-style airspace advisory layers around the Columbus, OH area — clicking any of these
   // (or the plan pin, which sits inside cmh-class-c-core) opens the advisory panel.
@@ -602,6 +760,57 @@
     return s;
   }
 
+  // ══════════════ Audit Log (Municipality Manager) ══════════════
+
+  const CURRENT_ACTOR = 'alenaartz2019@gmail.com';
+  const auditLog = [];
+
+  function logAuditEvent(action, actor, resource, details) {
+    auditLog.unshift({ time: new Date(), action, actor, resource, details });
+    if (document.getElementById('viewAuditLog').style.display !== 'none') renderAuditLog();
+  }
+
+  function seedAuditLog() {
+    const now = Date.now();
+    const seed = [
+      { mins: 165, action: 'Login', actor: CURRENT_ACTOR, resource: '—', details: '—' },
+      { mins: 140, action: 'Login', actor: 'operator@licking.gov', resource: '—', details: '—' },
+      { mins: 96, action: 'Disposition changed', actor: CURRENT_ACTOR, resource: 'detection:TRK-1183', details: JSON.stringify({ to: 'suspicious', from: 'unknown' }) },
+      { mins: 95, action: 'Alert email sent', actor: 'system:alerts', resource: 'detection:TRK-1183', details: JSON.stringify({ recipients: [CURRENT_ACTOR], disposition: 'suspicious' }) },
+      { mins: 61, action: 'Disposition changed', actor: CURRENT_ACTOR, resource: 'detection:TRK-1197', details: JSON.stringify({ to: 'suspicious', from: 'unknown' }) },
+      { mins: 60, action: 'Alert email sent', actor: 'system:alerts', resource: 'detection:TRK-1197', details: JSON.stringify({ recipients: [CURRENT_ACTOR], disposition: 'suspicious' }) },
+      { mins: 22, action: 'Export', actor: CURRENT_ACTOR, resource: 'detection:RID-4471', details: JSON.stringify({ format: 'PDF' }) },
+    ];
+    seed.forEach((e) => auditLog.push({ time: new Date(now - e.mins * 60000), action: e.action, actor: e.actor, resource: e.resource, details: e.details }));
+    auditLog.sort((a, b) => b.time - a.time);
+  }
+
+  function formatAuditTime(d) {
+    return d.toLocaleString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
+  }
+
+  function renderAuditLog() {
+    const filter = document.getElementById('auditFilterSelect').value;
+    const tbody = document.getElementById('auditTableBody');
+    const rows = filter === 'all' ? auditLog : auditLog.filter((e) => e.action === filter);
+    tbody.innerHTML = rows.length ? rows.map((e) => `
+      <tr>
+        <td>${formatAuditTime(e.time)}</td>
+        <td>${e.action}</td>
+        <td>${e.actor}</td>
+        <td>${e.resource}</td>
+        <td class="audit-details">${e.details}</td>
+      </tr>`).join('') : '<tr class="audit-empty-row"><td colspan="5">No matching audit events.</td></tr>';
+  }
+
+  function exportDetection(detectionId, format) {
+    logAuditEvent('Export', CURRENT_ACTOR, `detection:${detectionId}`, JSON.stringify({ format }));
+  }
+
+  function exportAllDetections() {
+    logAuditEvent('Export', CURRENT_ACTOR, `detections:all (${Object.keys(droneDetections).length})`, JSON.stringify({ format: 'PDF' }));
+  }
+
   // ══════════════ Drone Activity console (Municipality Manager) ══════════════
 
   let consoleMap = null;
@@ -671,7 +880,10 @@
 
       <div class="detail-section-label">Export</div>
       <div class="export-row">
-        <div class="export-chip">CSV</div><div class="export-chip">GeoJSON</div><div class="export-chip">KML</div><div class="export-chip">PDF</div>
+        <div class="export-chip" onclick="exportDetection('${d.id}','CSV')">CSV</div>
+        <div class="export-chip" onclick="exportDetection('${d.id}','GeoJSON')">GeoJSON</div>
+        <div class="export-chip" onclick="exportDetection('${d.id}','KML')">KML</div>
+        <div class="export-chip" onclick="exportDetection('${d.id}','PDF')">PDF</div>
       </div>`;
   }
 
@@ -690,6 +902,7 @@
     if (!pendingStatus) return;
     const id = selectedDroneId;
     const newStatus = pendingStatus;
+    const fromStatus = droneDetections[id].status;
     const isHighPriority = newStatus === 'suspicious' || newStatus === 'law_enforcement_referral';
     droneDetections[id].status = newStatus;
     pendingStatus = null;
@@ -697,6 +910,8 @@
     updateConsoleMarkerStatus(id);
     renderDroneDetail();
     showClassifyNotification(droneDetections[id], isHighPriority);
+    logAuditEvent('Disposition changed', CURRENT_ACTOR, `detection:${droneDetections[id].id}`, JSON.stringify({ to: newStatus, from: fromStatus }));
+    logAuditEvent('Alert email sent', 'system:alerts', `detection:${droneDetections[id].id}`, JSON.stringify({ recipients: ['alenaartz2019@gmail.com'], disposition: newStatus }));
   }
 
   function showClassifyNotification(d, isHighPriority) {
@@ -759,6 +974,13 @@
     highlightConsoleMarker();
   }
 
+  function addConsoleZoneLayer() {
+    const zonePolygon = createGeoJSONCircle(LICKING_COUNTY_CENTER, ZONE_RADIUS_KM);
+    consoleMap.addSource('zone-polygon', { type: 'geojson', data: zonePolygon });
+    consoleMap.addLayer({ id: 'zone-fill', type: 'fill', source: 'zone-polygon', paint: { 'fill-color': '#A78BFA', 'fill-opacity': 0.10 } });
+    consoleMap.addLayer({ id: 'zone-line', type: 'line', source: 'zone-polygon', paint: { 'line-color': '#A78BFA', 'line-width': 2 } });
+  }
+
   function initDroneActivityMap() {
     const token = (window.MAPBOX_TOKEN || '').trim();
     if (!token) {
@@ -768,16 +990,13 @@
     mapboxgl.accessToken = token;
     consoleMap = new mapboxgl.Map({
       container: 'console-map',
-      style: MAP_STYLES.light,
+      style: currentMapStyle(),
       center: LICKING_COUNTY_CENTER,
       zoom: 11.1,
     });
     consoleMap.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
     consoleMap.on('load', () => {
-      const zonePolygon = createGeoJSONCircle(LICKING_COUNTY_CENTER, ZONE_RADIUS_KM);
-      consoleMap.addSource('zone-polygon', { type: 'geojson', data: zonePolygon });
-      consoleMap.addLayer({ id: 'zone-fill', type: 'fill', source: 'zone-polygon', paint: { 'fill-color': '#A78BFA', 'fill-opacity': 0.10 } });
-      consoleMap.addLayer({ id: 'zone-line', type: 'line', source: 'zone-polygon', paint: { 'line-color': '#A78BFA', 'line-width': 2 } });
+      addConsoleZoneLayer();
 
       Object.entries(droneDetections).forEach(([id, d]) => {
         const el = document.createElement('div');
@@ -797,7 +1016,6 @@
   // ══════════════ Operational Map (Drone Operator, read-only) ══════════════
 
   let opMap = null;
-  let isDark = false;
   const opDroneMarkers = {};
   let planMarker = null;
 
@@ -922,7 +1140,7 @@
     mapboxgl.accessToken = token;
     opMap = new mapboxgl.Map({
       container: 'map',
-      style: MAP_STYLES.light,
+      style: currentMapStyle(),
       center: LICKING_COUNTY_CENTER, // default view: the drone monitoring zone, not the Columbus advisory layers
       zoom: 11.3,
     });
@@ -938,19 +1156,12 @@
     });
   }
 
-  document.getElementById('themeToggleBtn').addEventListener('click', function () {
-    if (!opMap) return;
-    isDark = !isDark;
-    this.classList.toggle('active', isDark);
-    opMap.setStyle(isDark ? MAP_STYLES.dark : MAP_STYLES.light);
-    opMap.once('style.load', addOpOverlays);
-  });
-
   // ══════════════ Navigation + role switching ══════════════
 
   function navigateTo(page) {
     document.getElementById('viewOperationalMap').style.display = page === 'operationalMap' ? 'block' : 'none';
     document.getElementById('viewDroneActivity').style.display = page === 'droneActivity' ? 'block' : 'none';
+    document.getElementById('viewAuditLog').style.display = page === 'auditLog' ? 'block' : 'none';
     const navDA = document.getElementById('navDroneActivity');
     const navOM = document.getElementById('navOperationalMap');
     if (navDA) navDA.classList.toggle('active', page === 'droneActivity');
@@ -959,9 +1170,11 @@
     if (page === 'operationalMap') {
       if (!opMap) initOperationalMap();
       else setTimeout(() => opMap.resize(), 30);
-    } else {
+    } else if (page === 'droneActivity') {
       if (!consoleMap) initDroneActivityMap();
       else setTimeout(() => consoleMap.resize(), 30);
+    } else if (page === 'auditLog') {
+      renderAuditLog();
     }
   }
 
@@ -985,6 +1198,8 @@
     }
   }
 
+  applyThemeToDom();
+  seedAuditLog();
   renderDroneList();
   navigateTo('droneActivity');
 </script>
