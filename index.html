@@ -220,6 +220,50 @@
   .detail-row span:first-child { color: var(--sky-text-tertiary); }
   .detail-row span:last-child { color: var(--sky-text-primary); font-weight: 600; }
 
+  /* Track-details header (long Remote ID + status chip) */
+  .track-id { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 17px; font-weight: 700; color: var(--sky-text-primary); letter-spacing: 0.02em; word-break: break-all; line-height: 1.25; }
+  .track-id .track-id-prefix { color: var(--sky-text-muted); }
+  .track-id .track-id-accent { color: var(--sky-status-danger-text); }
+  .status-chip.stale { background: var(--sky-surface-overlay); color: var(--sky-text-tertiary); border: 1px solid var(--sky-surface-border); }
+
+  /* Telemetry grid — 2-column tiles, one metric per tile (matches the Track Details reference) */
+  .telemetry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 4px 0 4px; }
+  .telemetry-grid.telemetry-grid-full { grid-template-columns: 1fr; }
+  .telemetry-tile { background: var(--sky-surface-overlay); border-radius: var(--sky-radius-md); padding: 10px 12px; min-width: 0; }
+  .telemetry-tile .tt-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--sky-text-muted); margin-bottom: 4px; }
+  .telemetry-tile .tt-value { font-size: 15px; font-weight: 700; color: var(--sky-text-primary); font-variant-numeric: tabular-nums; word-break: break-word; }
+  .telemetry-tile .tt-value.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13.5px; }
+  .telemetry-tile .tt-unit { font-size: 11px; font-weight: 500; color: var(--sky-text-muted); margin-left: 3px; }
+
+  /* Freshness — distinct from authorization status: Live (actively updating), Fresh (recent), Stale (aging out) */
+  .status-chip.live { background: var(--sky-success-bg); color: var(--sky-status-success-text); border: 1px solid var(--sky-success-border); }
+  .status-chip.fresh { background: var(--sky-info-bg); color: var(--sky-status-info-text); border: 1px solid var(--sky-info-border); }
+  .freshness-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+  .freshness-dot.live { background: var(--sky-success-light); box-shadow: 0 0 0 3px var(--sky-success-bg); }
+  .freshness-dot.fresh { background: var(--sky-info-light); box-shadow: 0 0 0 3px var(--sky-info-bg); }
+  .freshness-dot.stale { background: var(--sky-text-muted); }
+
+  /* Stat strip — Active / Fresh / Stale counts above the tracked-object list */
+  .stat-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 16px 12px; }
+  .stat-tile { background: var(--sky-surface-overlay); border-radius: var(--sky-radius-md); padding: 9px 11px; }
+  .stat-tile .stat-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--sky-text-muted); margin-bottom: 3px; }
+  .stat-tile .stat-value { font-size: 18px; font-weight: 800; color: var(--sky-text-primary); font-variant-numeric: tabular-nums; }
+
+  /* Drone-list search box */
+  .drone-search { display: flex; align-items: center; gap: 8px; margin: 0 16px 12px; padding: 8px 12px; border-radius: var(--sky-radius-full); border: 1px solid var(--sky-surface-border); background: var(--sky-surface); color: var(--sky-text-tertiary); }
+  .drone-search svg { flex-shrink: 0; }
+  .drone-search input { border: none; background: transparent; outline: none; font-size: 12.5px; color: var(--sky-text-primary); width: 100%; font-family: inherit; }
+  .drone-search input::placeholder { color: var(--sky-text-muted); }
+
+  .incident-top-left { display: flex; align-items: center; gap: 7px; min-width: 0; }
+  .incident-meta-row { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--sky-text-tertiary); }
+  .incident-meta-row .dot-sep { opacity: 0.5; }
+
+  /* Path-altitude gradient legend, top-left of the map (Drone Detection View only) */
+  .path-altitude-legend { position: absolute; top: 92px; left: 50%; transform: translateX(-50%); z-index: 19; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.96); border: 1px solid var(--sky-surface-border); border-radius: var(--sky-radius-md); padding: 9px 14px; box-shadow: var(--sky-shadow-md); font-size: 11.5px; color: var(--sky-text-secondary); transition: top 0.2s ease; white-space: nowrap; }
+  .path-altitude-legend .pal-bar { width: 130px; height: 8px; border-radius: 999px; background: linear-gradient(90deg, #F59E0B, #EF4444, #22D3EE, #38BDF8); }
+  .path-altitude-legend .pal-min, .path-altitude-legend .pal-max { font-size: 10.5px; color: var(--sky-text-muted); }
+
   .readonly-note { display: flex; align-items: flex-start; gap: 9px; padding: 10px 12px; background: var(--sky-info-bg); border: 1px solid var(--sky-info-border); color: var(--sky-status-info-text); border-radius: var(--sky-radius-md); font-size: 12px; line-height: 1.5; margin-top: 12px; }
   .readonly-note svg { flex-shrink: 0; margin-top: 1px; }
 
@@ -272,6 +316,7 @@
   #viewOperationalMap.has-notification #droneListPanel,
   #viewOperationalMap.has-notification #droneDetailPanel { top: 148px; max-height: calc(100% - 168px); }
   #viewOperationalMap.has-notification .da-list-toggle { top: 148px; }
+  #viewOperationalMap.has-notification .path-altitude-legend { top: 148px; }
 
   .detail-section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--sky-text-muted); margin: 16px 0 8px; }
   .detail-section-label:first-child { margin-top: 0; }
@@ -324,7 +369,8 @@
      since they need transparency to show map tiles through the edges). */
   :root[data-theme="dark"] #map { background: #0F172A; }
   :root[data-theme="dark"] .legend,
-  :root[data-theme="dark"] .map-legend { background: rgba(30,41,59,0.94); }
+  :root[data-theme="dark"] .map-legend,
+  :root[data-theme="dark"] .path-altitude-legend { background: rgba(30,41,59,0.94); }
   :root[data-theme="dark"] .proto-tag { background: rgba(30,41,59,0.85); }
 
   /* Theme toggle switch (sidebar) */
@@ -500,6 +546,14 @@
         <div class="legend-row"><span class="legend-dot" style="background:#A78BFA;"></span> Licking County monitoring zone</div>
       </div>
 
+      <!-- Flight-path color key — shown alongside a selected track's trail (Drone Detection View) -->
+      <div class="path-altitude-legend" id="pathAltitudeLegend" style="display:none;">
+        <span>Path Altitude</span>
+        <span class="pal-min" id="pathAltMin">0ft</span>
+        <span class="pal-bar"></span>
+        <span class="pal-max" id="pathAltMax">400ft</span>
+      </div>
+
       <!-- Flight-planning advisory panel (Advisories View) -->
       <div class="side-panel" id="planPanel">
         <div class="side-panel-header">
@@ -531,16 +585,21 @@
       <!-- Toggle for the detection list (Municipality Manager, hidden while the panel is open) -->
       <button class="da-list-toggle" id="droneListToggle" onclick="toggleDroneList()" style="display:none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-        Detections (9)
+        <span id="droneListToggleLabel">Detections (9)</span>
       </button>
 
       <!-- Floating detection list (Municipality Manager, overlay) -->
       <div class="side-panel side-panel-left" id="droneListPanel">
         <div class="side-panel-header">
-          <div class="side-panel-title">Detections (9)</div>
+          <div class="side-panel-title" id="droneListTitle">Detections (9)</div>
           <button class="side-panel-close" onclick="closeDroneListPanel()">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6 6 18M6 6l12 12"/></svg>
           </button>
+        </div>
+        <div class="stat-strip" id="droneStatStrip"></div>
+        <div class="drone-search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="droneSearchInput" placeholder="Search drone ID…" oninput="renderDroneList()">
         </div>
         <div class="side-panel-body" id="droneList"></div>
       </div>
@@ -634,7 +693,12 @@
     if (opMap) {
       mapLayersReady = false;
       opMap.setStyle(currentMapStyle());
-      opMap.once('style.load', () => { addOpOverlays(); mapLayersReady = true; applyViewModeToLayers(); });
+      opMap.once('style.load', () => {
+        addOpOverlays();
+        mapLayersReady = true;
+        applyViewModeToLayers();
+        if (selectedDroneId) showDronePath(selectedDroneId); // re-draw the trail lost on style swap
+      });
     }
   }
 
@@ -690,48 +754,81 @@
 
   // Shared dataset — same detections drive both the Operational Map (read-only) and Drone Activity console.
   const droneDetections = {
-    1: { id: 'RID-4471', status: 'authorized', lngLat: [-82.393, 40.064], alt: '320 ft AGL', dist: '0.5 mi · near LCEMA EOC', remoteId: 'RID-4471-88C2', operator: 'Registered — Heath PD Training Flight', laanc: 'Approved, Class E — Newark-Heath (VTA)', events: [
+    1: { id: 'RID-4471', status: 'authorized', lngLat: [-82.393, 40.064], alt: '320 ft AGL', dist: '0.5 mi · near LCEMA EOC', remoteId: 'RID-4471-88C2', operator: 'Registered — Heath PD Training Flight', laanc: 'Approved, Class E — Newark-Heath (VTA)',
+      trackId: '1581F163DF7K001K9950', altFt: 320, speed: '18.4 km/h', heading: '112 deg', rssi: '-71 dBm', tech: 'WB', sensor: '07', source: 'dronetag_scout', firstSeen: '14:02:11', lastSeen: '14:03:48', confidence: '>90%', freshness: 'live', lastSeenSecAgo: 4, events: [
       { t: '14:02:11', text: 'Detected via Remote ID broadcast' },
       { t: '14:02:14', text: 'Matched to active LAANC authorization' },
       { t: '14:02:15', text: 'Auto-classified: Authorized' },
     ]},
-    2: { id: 'TRK-1182', status: 'unknown', lngLat: [-82.410, 40.050], alt: '210 ft AGL', dist: '0.7 mi · near Port Authority campus', remoteId: 'Not broadcasting', operator: 'Unknown', laanc: 'No matching authorization', events: [
+    2: { id: 'TRK-1182', status: 'unknown', lngLat: [-82.410, 40.050], alt: '210 ft AGL', dist: '0.7 mi · near Port Authority campus', remoteId: 'Not broadcasting', operator: 'Unknown', laanc: 'No matching authorization',
+      trackId: '1581F6Z9A23ATML33HVF', altFt: 210, speed: '26.1 km/h', heading: '— deg', rssi: '-94 dBm', tech: 'WB', sensor: '13', source: 'dronetag_scout', firstSeen: '14:08:40', lastSeen: '14:09:12', confidence: '<30%', freshness: 'stale', lastSeenSecAgo: 35458, events: [
       { t: '14:08:40', text: 'Detected via RF sensor (no Remote ID)' },
       { t: '14:08:52', text: 'No LAANC match found' },
       { t: '14:09:01', text: 'Flagged for manual review' },
     ]},
-    3: { id: 'TRK-1183', status: 'suspicious', lngLat: [-82.406, 40.057], alt: '140 ft AGL', dist: '0.3 mi · approaching Port Authority campus', remoteId: 'Not broadcasting', operator: 'Unknown', laanc: 'No matching authorization', events: [
+    3: { id: 'TRK-1183', status: 'suspicious', lngLat: [-82.406, 40.057], alt: '140 ft AGL', dist: '0.3 mi · approaching Port Authority campus', remoteId: 'Not broadcasting', operator: 'Unknown', laanc: 'No matching authorization',
+      trackId: '1581F6K2M77BQXP19042', altFt: 140, speed: '31.7 km/h', heading: '204 deg', rssi: '-88 dBm', tech: 'BT5', sensor: '13', source: 'dronetag_scout', firstSeen: '14:11:03', lastSeen: '14:11:55', confidence: '48%', freshness: 'fresh', lastSeenSecAgo: 92, events: [
       { t: '14:11:03', text: 'Detected via radar + RF fusion' },
       { t: '14:11:20', text: 'Track approaching critical facility boundary' },
       { t: '14:11:22', text: 'Alert triggered — flagged Suspicious' },
     ]},
-    4: { id: 'RID-4482', status: 'authorized', lngLat: [-82.399, 40.100], alt: '410 ft AGL', dist: '4.9 mi · near North perimeter tower', remoteId: 'RID-4482-11F0', operator: 'Registered — Commercial survey operator', laanc: 'Approved, Class D — Newark-Heath (VTA)', events: [
+    4: { id: 'RID-4482', status: 'authorized', lngLat: [-82.399, 40.100], alt: '410 ft AGL', dist: '4.9 mi · near North perimeter tower', remoteId: 'RID-4482-11F0', operator: 'Registered — Commercial survey operator', laanc: 'Approved, Class D — Newark-Heath (VTA)',
+      trackId: '1581F1A0CC4R552T8830', altFt: 410, speed: '42.0 km/h', heading: '058 deg', rssi: '-76 dBm', tech: 'WB', sensor: '04', source: 'dronetag_scout', firstSeen: '14:15:30', lastSeen: '14:17:02', confidence: '>90%', freshness: 'live', lastSeenSecAgo: 2, events: [
       { t: '14:15:30', text: 'Detected via Remote ID broadcast' },
       { t: '14:15:33', text: 'Matched to active LAANC authorization' },
     ]},
-    5: { id: 'RID-4490', status: 'authorized', lngLat: [-82.340, 40.059], alt: '260 ft AGL', dist: '3.8 mi · near East public safety site', remoteId: 'RID-4490-77A1', operator: 'Registered — Newark PD Patrol', laanc: 'Approved, Class E — Newark-Heath (VTA)', events: [
+    5: { id: 'RID-4490', status: 'authorized', lngLat: [-82.340, 40.059], alt: '260 ft AGL', dist: '3.8 mi · near East public safety site', remoteId: 'RID-4490-77A1', operator: 'Registered — Newark PD Patrol', laanc: 'Approved, Class E — Newark-Heath (VTA)',
+      trackId: '1581F1B7EE9P210V4471', altFt: 260, speed: '22.9 km/h', heading: '271 deg', rssi: '-69 dBm', tech: 'WB', sensor: '09', source: 'dronetag_scout', firstSeen: '14:19:02', lastSeen: '14:20:40', confidence: '84%', freshness: 'fresh', lastSeenSecAgo: 58, events: [
       { t: '14:19:02', text: 'Detected via Remote ID broadcast' },
       { t: '14:19:05', text: 'Matched to active LAANC authorization' },
     ]},
-    6: { id: 'TRK-1191', status: 'unknown', lngLat: [-82.460, 40.058], alt: '190 ft AGL', dist: '4.1 mi · near West trailer node', remoteId: 'Not broadcasting', operator: 'Unknown', laanc: 'No matching authorization', events: [
+    6: { id: 'TRK-1191', status: 'unknown', lngLat: [-82.460, 40.058], alt: '190 ft AGL', dist: '4.1 mi · near West trailer node', remoteId: 'Not broadcasting', operator: 'Unknown', laanc: 'No matching authorization',
+      trackId: '1581F6P4A18CNML55201', altFt: 190, speed: '15.3 km/h', heading: '— deg', rssi: '-97 dBm', tech: 'BT4', sensor: '11', source: 'dronetag_scout', firstSeen: '14:23:47', lastSeen: '14:24:15', confidence: '<30%', freshness: 'stale', lastSeenSecAgo: 223125, events: [
       { t: '14:23:47', text: 'Detected via RF sensor (no Remote ID)' },
       { t: '14:23:55', text: 'No LAANC match found' },
       { t: '14:24:02', text: 'Flagged for manual review' },
     ]},
-    7: { id: 'RID-4495', status: 'authorized', lngLat: [-82.404, 40.018], alt: '300 ft AGL', dist: '3.4 mi · near South mobile kit', remoteId: 'RID-4495-22B7', operator: 'Registered — Licking County Sheriff patrol', laanc: 'Approved, Class E — Newark-Heath (VTA)', events: [
+    7: { id: 'RID-4495', status: 'authorized', lngLat: [-82.404, 40.018], alt: '300 ft AGL', dist: '3.4 mi · near South mobile kit', remoteId: 'RID-4495-22B7', operator: 'Registered — Licking County Sheriff patrol', laanc: 'Approved, Class E — Newark-Heath (VTA)',
+      trackId: '1581F1C3FF2S908R3312', altFt: 300, speed: '28.6 km/h', heading: '349 deg', rssi: '-73 dBm', tech: 'WB', sensor: '06', source: 'dronetag_scout', firstSeen: '14:27:10', lastSeen: '14:28:52', confidence: '>90%', freshness: 'live', lastSeenSecAgo: 6, events: [
       { t: '14:27:10', text: 'Detected via Remote ID broadcast' },
       { t: '14:27:13', text: 'Matched to active LAANC authorization' },
     ]},
-    8: { id: 'TRK-1197', status: 'suspicious', lngLat: [-82.397, 40.061], alt: '95 ft AGL', dist: '0.2 mi · close approach to LCEMA EOC', remoteId: 'Not broadcasting', operator: 'Unknown', laanc: 'No matching authorization', events: [
+    8: { id: 'TRK-1197', status: 'suspicious', lngLat: [-82.397, 40.061], alt: '95 ft AGL', dist: '0.2 mi · close approach to LCEMA EOC', remoteId: 'Not broadcasting', operator: 'Unknown', laanc: 'No matching authorization',
+      trackId: '1581F6H8B55DKRT27709', altFt: 95, speed: '12.8 km/h', heading: '166 deg', rssi: '-82 dBm', tech: 'BT5', sensor: '07', source: 'dronetag_scout', firstSeen: '14:31:02', lastSeen: '14:32:30', confidence: '55%', freshness: 'fresh', lastSeenSecAgo: 141, events: [
       { t: '14:31:02', text: 'Detected via radar + RF fusion' },
       { t: '14:31:18', text: 'Low-altitude track near operations hub' },
       { t: '14:31:20', text: 'Alert triggered — flagged Suspicious' },
     ]},
-    9: { id: 'RID-4502', status: 'authorized', lngLat: [-82.401, 40.075], alt: '270 ft AGL', dist: '1.9 mi · central zone', remoteId: 'RID-4502-90D4', operator: 'Registered — Commercial survey operator', laanc: 'Approved, Class E — Newark-Heath (VTA)', events: [
+    9: { id: 'RID-4502', status: 'authorized', lngLat: [-82.401, 40.075], alt: '270 ft AGL', dist: '1.9 mi · central zone', remoteId: 'RID-4502-90D4', operator: 'Registered — Commercial survey operator', laanc: 'Approved, Class E — Newark-Heath (VTA)',
+      trackId: '1581F1D9AA6T430K8823', altFt: 270, speed: '35.2 km/h', heading: '090 deg', rssi: '-68 dBm', tech: 'WB', sensor: '02', source: 'dronetag_scout', firstSeen: '14:36:44', lastSeen: '14:38:20', confidence: '88%', freshness: 'stale', lastSeenSecAgo: 389741, events: [
       { t: '14:36:44', text: 'Detected via Remote ID broadcast' },
       { t: '14:36:47', text: 'Matched to active LAANC authorization' },
     ]},
   };
+
+  // Synthetic flight paths — a short trail leading into each drone's current position.
+  // Each path is a run of [lng, lat] points ending at the marker; the map renders it as a
+  // time-graduated line (older = warm/orange, newest = cool/cyan) when the drone is selected.
+  // Headings vary per drone so the trails fan out naturally, matching the live-tracking look.
+  (function buildDronePaths() {
+    const HEADINGS = { 1: 250, 2: 265, 3: 205, 4: 58, 5: 271, 6: 285, 7: 349, 8: 166, 9: 90 };
+    const STEPS = 14;          // number of trail points behind the drone
+    const STEP_KM = 0.14;      // spacing between successive points
+    Object.entries(droneDetections).forEach(([id, d]) => {
+      const bearing = ((HEADINGS[id] || 90) + 180) * Math.PI / 180; // walk backwards from current pos
+      const [lng, lat] = d.lngLat;
+      const path = [];
+      for (let i = STEPS; i >= 0; i--) {
+        const distKm = i * STEP_KM;
+        // gentle sinusoidal drift so the trail curves instead of being dead straight
+        const drift = Math.sin(i / 3) * 0.10 * STEP_KM;
+        const dLat = (distKm * Math.cos(bearing) + drift * Math.sin(bearing)) / 110.574;
+        const dLng = (distKm * Math.sin(bearing) - drift * Math.cos(bearing)) / (111.320 * Math.cos(lat * Math.PI / 180));
+        path.push([lng + dLng, lat + dLat]);
+      }
+      d.path = path; // path[0] = oldest, last = current position
+    });
+  })();
 
   function statusLabel(s) {
     if (s === 'authorized') return 'Authorized';
@@ -739,6 +836,59 @@
     if (s === 'suspicious') return 'Suspicious';
     if (s === 'law_enforcement_referral') return 'LE Referral';
     return s;
+  }
+
+  // One telemetry tile (label + value, optional trailing unit). `mono` for monospace values.
+  function telemetryTile(label, value, unit, mono) {
+    const unitHtml = unit ? `<span class="tt-unit">${unit}</span>` : '';
+    return `<div class="telemetry-tile"><div class="tt-label">${label}</div><div class="tt-value${mono ? ' mono' : ''}">${value}${unitHtml}</div></div>`;
+  }
+
+  // The 2-column telemetry grid shared by the Manager detail panel and the Operator info panel.
+  function telemetryGridHtml(d) {
+    return `<div class="telemetry-grid">
+      ${telemetryTile('Altitude', d.altFt, 'ft')}
+      ${telemetryTile('Speed', d.speed.replace(' km/h', ''), 'km/h')}
+      ${telemetryTile('Heading', d.heading.replace(' deg', ''), 'deg')}
+      ${telemetryTile('Latitude', d.lngLat[1].toFixed(6), '', true)}
+      ${telemetryTile('Longitude', d.lngLat[0].toFixed(6), '', true)}
+      ${telemetryTile('RSSI', d.rssi.replace(' dBm', ''), 'dBm')}
+      ${telemetryTile('Tech', d.tech, '', true)}
+      ${telemetryTile('Sensor', d.sensor)}
+      ${telemetryTile('Source', d.source, '', true)}
+      ${telemetryTile('Confidence', d.confidence)}
+      ${telemetryTile('First Seen', d.firstSeen, '', true)}
+      ${telemetryTile('Last Seen', `${d.lastSeen} <span class="tt-unit">(${formatTimeAgo(d.lastSeenSecAgo)})</span>`, '', true)}
+    </div>`;
+  }
+
+  // Track ID header: colorize the "1581F" family prefix so the identifier is scannable.
+  function trackIdHtml(trackId) {
+    if (!trackId) return '';
+    const m = trackId.match(/^(1581F)(.*)$/);
+    return m
+      ? `<div class="track-id"><span class="track-id-prefix">${m[1]}</span><span class="track-id-accent">${m[2].slice(0, 1)}</span>${m[2].slice(1)}</div>`
+      : `<div class="track-id">${trackId}</div>`;
+  }
+
+  // ══════════════ Freshness (Live / Fresh / Stale) — reporting cadence, independent of authorization status ══════════════
+  // Live: updated in the last ~30s. Fresh: seen recently but not actively streaming. Stale: no update in a long while.
+  const FRESHNESS_LABELS = { live: 'Live', fresh: 'Fresh', stale: 'Stale' };
+
+  function freshnessLabel(f) {
+    return FRESHNESS_LABELS[f] || f;
+  }
+
+  function freshnessChipHtml(f) {
+    return `<span class="status-chip ${f}">${freshnessLabel(f)}</span>`;
+  }
+
+  // Compact "Xs ago" / "Xm ago" / "Xh ago" formatting for the list rows and detail header.
+  function formatTimeAgo(seconds) {
+    if (seconds < 60) return `${seconds}s ago`;
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    return `${Math.floor(seconds / 86400)}d ago`;
   }
 
   // ══════════════ Audit Log (Municipality Manager) ══════════════
@@ -796,16 +946,43 @@
 
   let selectedDroneId = null;
 
+  function renderDroneStatStrip() {
+    const strip = document.getElementById('droneStatStrip');
+    if (!strip) return;
+    const all = Object.values(droneDetections);
+    const counts = { active: all.length, fresh: all.filter((d) => d.freshness === 'fresh' || d.freshness === 'live').length, stale: all.filter((d) => d.freshness === 'stale').length };
+    strip.innerHTML = `
+      <div class="stat-tile"><div class="stat-label">Active</div><div class="stat-value">${counts.active}</div></div>
+      <div class="stat-tile"><div class="stat-label">Fresh</div><div class="stat-value">${counts.fresh}</div></div>
+      <div class="stat-tile"><div class="stat-label">Stale</div><div class="stat-value">${counts.stale}</div></div>`;
+  }
+
   function renderDroneList() {
     const list = document.getElementById('droneList');
-    list.innerHTML = Object.entries(droneDetections).map(([id, d]) => `
+    const searchInput = document.getElementById('droneSearchInput');
+    const query = (searchInput ? searchInput.value : '').trim().toLowerCase();
+    const entries = Object.entries(droneDetections).filter(([, d]) =>
+      !query || d.id.toLowerCase().includes(query) || (d.trackId || '').toLowerCase().includes(query));
+
+    document.getElementById('droneListTitle').textContent = `Detections (${entries.length})`;
+    document.getElementById('droneListToggleLabel').textContent = `Detections (${Object.keys(droneDetections).length})`;
+    renderDroneStatStrip();
+
+    list.innerHTML = entries.length ? entries.map(([id, d]) => `
       <div class="incident-card ${Number(id) === selectedDroneId ? 'selected' : ''}" data-id="${id}" onclick="selectDroneDetection(${id})">
         <div class="incident-top">
-          <span class="incident-id">${d.id}</span>
+          <div class="incident-top-left">
+            <span class="freshness-dot ${d.freshness}"></span>
+            <span class="incident-id">${d.id}</span>
+          </div>
           <span class="status-chip ${d.status}">${statusLabel(d.status)}</span>
         </div>
-        <div class="incident-meta">${d.alt} · ${d.dist}</div>
-      </div>`).join('');
+        <div class="incident-meta-row">
+          <span>${d.speed.replace(' km/h', '')} km/h</span><span class="dot-sep">·</span>
+          <span>${d.altFt} ft</span><span class="dot-sep">·</span>
+          <span>${formatTimeAgo(d.lastSeenSecAgo)}</span>
+        </div>
+      </div>`).join('') : '<div style="text-align:center; color:var(--sky-text-muted); font-size:12.5px; padding:20px 0;">No matching drone IDs.</div>';
   }
 
   function highlightSelectedMarker() {
@@ -831,14 +1008,28 @@
     const body = document.getElementById('droneDetail');
     const hasPending = pendingStatus && pendingStatus !== d.status;
     body.innerHTML = `
+      <div class="detail-section-label">Track Details</div>
+      ${trackIdHtml(d.trackId)}
+      <div style="display:flex; gap:6px; flex-wrap:wrap; margin:10px 0 4px;">
+        ${freshnessChipHtml(d.freshness)}
+        <span class="status-chip ${d.status}">${statusLabel(d.status)}</span>
+      </div>
+      ${telemetryGridHtml(d)}
+      <button class="btn btn-primary" style="margin-top:6px;" onclick="centerOnDrone(${selectedDroneId})">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
+        Center on Map
+      </button>
+
       <div class="detail-section-label">Detection</div>
-      <div class="detail-row"><span>ID</span><span>${d.id}</span></div>
-      <div class="detail-row"><span>Status</span><span>${statusLabel(d.status)}</span></div>
-      <div class="detail-row"><span>Altitude</span><span>${d.alt}</span></div>
-      <div class="detail-row"><span>Distance</span><span>${d.dist}</span></div>
-      <div class="detail-row"><span>Remote ID</span><span>${d.remoteId}</span></div>
-      <div class="detail-row"><span>Operator</span><span>${d.operator}</span></div>
-      <div class="detail-row"><span>Authorization</span><span>${d.laanc}</span></div>
+      <div class="telemetry-grid">
+        ${telemetryTile('ID', d.id, '', true)}
+        ${telemetryTile('Distance', d.dist)}
+      </div>
+      <div class="telemetry-grid telemetry-grid-full">
+        ${telemetryTile('Remote ID', d.remoteId, '', true)}
+        ${telemetryTile('Operator', d.operator)}
+        ${telemetryTile('Authorization', d.laanc)}
+      </div>
 
       <div class="detail-section-label">Classify</div>
       ${hasPending ? `<div class="classify-pending-note">Pending: ${statusLabel(pendingStatus)} — not saved yet</div>` : ''}
@@ -929,11 +1120,19 @@
     highlightSelectedMarker();
     renderDroneDetail();
     document.getElementById('droneDetailPanel').classList.add('open');
+    showDronePath(id);
     if (opMap) opMap.flyTo({ center: droneDetections[id].lngLat, zoom: Math.max(opMap.getZoom(), 13), speed: 0.8 });
   }
 
   function closeDroneDetailPanel() {
     document.getElementById('droneDetailPanel').classList.remove('open');
+    clearDronePath();
+  }
+
+  // Recenter the map on the currently selected detection.
+  function centerOnDrone(id) {
+    const d = droneDetections[id];
+    if (opMap && d) opMap.flyTo({ center: d.lngLat, zoom: Math.max(opMap.getZoom(), 14), speed: 0.8 });
   }
 
   function toggleDroneList() {
@@ -968,6 +1167,62 @@
     opMap.addSource('county-boundary', { type: 'geojson', data: countyBoundary });
     opMap.addLayer({ id: 'county-boundary-fill', type: 'fill', source: 'county-boundary', paint: { 'fill-color': '#A78BFA', 'fill-opacity': 0.10 } });
     opMap.addLayer({ id: 'county-boundary-line', type: 'line', source: 'county-boundary', paint: { 'line-color': '#A78BFA', 'line-width': 2 } });
+
+    addDronePathLayer();
+  }
+
+  // Flight-path trail for the selected drone. A single 'lineMetrics' source we swap data into,
+  // drawn with a time-graduated line-gradient (oldest = orange → newest = cyan), matching the
+  // live-tracking trail in the reference design.
+  function addDronePathLayer() {
+    opMap.addSource('drone-path', {
+      type: 'geojson',
+      lineMetrics: true,
+      data: { type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [] } },
+    });
+    opMap.addLayer({
+      id: 'drone-path-line',
+      type: 'line',
+      source: 'drone-path',
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: {
+        'line-width': 3.5,
+        'line-gradient': [
+          'interpolate', ['linear'], ['line-progress'],
+          0.00, '#F59E0B',   // oldest — orange
+          0.45, '#EF4444',   // red
+          0.75, '#22D3EE',   // cyan
+          1.00, '#38BDF8',   // newest — light blue (near the drone)
+        ],
+      },
+    });
+  }
+
+  function showDronePath(id) {
+    if (!opMap || !mapLayersReady) return;
+    const d = droneDetections[id];
+    if (!d || !d.path) return;
+    const src = opMap.getSource('drone-path');
+    if (src) src.setData({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: d.path } });
+
+    // The trail's color encodes recency (orange=oldest -> blue=newest); label the key with the
+    // altitude band the drone held over that trail so the key still reads as a useful reference.
+    const legend = document.getElementById('pathAltitudeLegend');
+    if (legend) {
+      const altLow = Math.max(0, d.altFt - 60);
+      const altHigh = d.altFt + 20;
+      document.getElementById('pathAltMin').textContent = `${altLow}ft`;
+      document.getElementById('pathAltMax').textContent = `${altHigh}ft`;
+      legend.style.display = 'flex';
+    }
+  }
+
+  function clearDronePath() {
+    if (!opMap) return;
+    const src = opMap.getSource('drone-path');
+    if (src) src.setData({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [] } });
+    const legend = document.getElementById('pathAltitudeLegend');
+    if (legend) legend.style.display = 'none';
   }
 
   function addAirspaceZones() {
@@ -1067,18 +1322,30 @@
     closePlanPanel();
     document.getElementById('droneInfoTitle').textContent = d.id;
     document.getElementById('droneInfoBody').innerHTML = `
-      <span class="status-chip ${d.status}" style="display:inline-block; margin-bottom:12px;">${statusLabel(d.status)}</span>
-      <div class="detail-row"><span>Remote ID</span><span>${d.remoteId}</span></div>
-      <div class="detail-row"><span>Altitude</span><span>${d.alt}</span></div>
-      <div class="detail-row"><span>Distance</span><span>${d.dist}</span></div>
+      ${trackIdHtml(d.trackId)}
+      <div style="display:flex; gap:6px; flex-wrap:wrap; margin:10px 0 4px;">
+        ${freshnessChipHtml(d.freshness)}
+        <span class="status-chip ${d.status}">${statusLabel(d.status)}</span>
+      </div>
+      ${telemetryGridHtml(d)}
+      <button class="btn btn-primary" style="margin:6px 0 4px;" onclick="centerOnDrone(${id})">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
+        Center on Map
+      </button>
+      <div class="telemetry-grid telemetry-grid-full">
+        ${telemetryTile('Remote ID', d.remoteId, '', true)}
+        ${telemetryTile('Distance', d.dist)}
+      </div>
       <div class="readonly-note">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg>
         <span>Read-only. Classification and incident history are managed by the Municipality Manager.</span>
       </div>`;
     document.getElementById('droneInfoPanel').classList.add('open');
+    showDronePath(id);
   }
   function closeDroneInfo() {
     document.getElementById('droneInfoPanel').classList.remove('open');
+    clearDronePath();
   }
   function closePlanPanel() {
     document.getElementById('planPanel').classList.remove('open');
@@ -1144,6 +1411,7 @@
     if (!viewModes.detections) {
       closeDroneInfo();
       closeDroneDetailPanel();
+      clearDronePath();
       document.getElementById('droneListPanel').classList.remove('open');
       listToggle.style.display = 'none';
     } else if (currentRole === 'manager') {
